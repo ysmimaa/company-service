@@ -22,4 +22,12 @@ public class UserServiceImpl implements UserService {
     public List<User> getListOfUser() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User createUser(User user) {
+        if (user != null) {
+            return userRepository.save(user);
+        }
+        return null;
+    }
 }

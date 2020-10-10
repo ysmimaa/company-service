@@ -11,4 +11,11 @@ public interface UserService {
      * @return a list of user
      */
     List<User> getListOfUser();
+
+    /**
+     * Method creating a user
+     * @param user
+     * @return the user created
+     */
+    User createUser(User user);
 }
