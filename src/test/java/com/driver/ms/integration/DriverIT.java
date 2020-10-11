@@ -1,9 +1,9 @@
-package com.driver.ride.integration;
+package com.driver.ms.integration;
 
-import com.driver.ride.common.constant.utils.JsonUtils;
-import com.driver.ride.common.constant.DriverConstant;
-import com.driver.ride.entity.Driver;
-import com.driver.ride.service.DriverService;
+import com.driver.ms.common.constant.utils.JsonUtils;
+import com.driver.ms.common.constant.DriverConstant;
+import com.driver.ms.entity.Driver;
+import com.driver.ms.service.DriverService;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.jupiter.api.Test;

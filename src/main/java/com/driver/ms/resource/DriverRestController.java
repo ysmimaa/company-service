@@ -1,13 +1,12 @@
-package com.driver.ride.resource;
+package com.driver.ms.resource;
 
-import com.driver.ride.service.DriverService;
-import com.driver.ride.common.constant.DriverConstant;
-import com.driver.ride.entity.Driver;
+import com.driver.ms.service.DriverService;
+import com.driver.ms.common.constant.DriverConstant;
+import com.driver.ms.entity.Driver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.driver.ride.common.constant.utils;
+package com.driver.ms.common.constant.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

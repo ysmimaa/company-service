@@ -1,9 +1,9 @@
-package com.driver.ride.resource;
+package com.driver.ms.resource;
 
-import com.driver.ride.common.constant.utils.JsonUtils;
-import com.driver.ride.service.DriverService;
-import com.driver.ride.common.constant.DriverConstant;
-import com.driver.ride.entity.Driver;
+import com.driver.ms.common.constant.utils.JsonUtils;
+import com.driver.ms.service.DriverService;
+import com.driver.ms.common.constant.DriverConstant;
+import com.driver.ms.entity.Driver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

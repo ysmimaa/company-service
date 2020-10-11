@@ -1,6 +1,6 @@
-package com.driver.ride.entity;
+package com.driver.ms.entity;
 
-import com.driver.ride.common.constant.DriverConstant;
+import com.driver.ms.common.constant.DriverConstant;
 import lombok.*;
 
 import javax.persistence.*;

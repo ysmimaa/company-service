@@ -1,4 +1,4 @@
-package com.driver.ride.common.constant;
+package com.driver.ms.common.constant;
 
 /**
  * Interface that centralize the user constants

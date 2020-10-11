@@ -1,4 +1,4 @@
-package com.driver.ride.config.properties;
+package com.driver.ms.config.properties;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

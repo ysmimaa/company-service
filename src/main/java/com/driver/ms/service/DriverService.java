@@ -1,6 +1,6 @@
-package com.driver.ride.service;
+package com.driver.ms.service;
 
-import com.driver.ride.entity.Driver;
+import com.driver.ms.entity.Driver;
 
 import java.util.List;
 

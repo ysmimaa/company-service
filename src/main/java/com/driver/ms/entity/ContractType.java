@@ -1,4 +1,4 @@
-package com.driver.ride.entity;
+package com.driver.ms.entity;
 
 public enum ContractType {
     CDD,

@@ -1,7 +1,7 @@
-package com.driver.ride.service.impl;
+package com.driver.ms.service.impl;
 
-import com.driver.ride.repository.DriverRepository;
-import com.driver.ride.entity.Driver;
+import com.driver.ms.repository.DriverRepository;
+import com.driver.ms.entity.Driver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
