@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Getter
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:bootstrap.properties")
 @Configuration
 public class DriverProperties {
 
