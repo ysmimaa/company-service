@@ -19,12 +19,4 @@ public class DriverProperties {
     @Value("${ms.driver.version}")
     private String version;
 
-    @Value("${ms.driver.group}")
-    private String group;
-
-    @Value("${ms.driver.package-to-scan}")
-    private String packageToScan;
-
-    @Value("${ms.driver.path}")
-    private String path;
 }
