@@ -1,5 +1,6 @@
 package com.driver.ms.resource;
 
+import com.driver.ms.entity.ContractType;
 import com.driver.ms.service.DriverService;
 import com.driver.ms.common.constant.DriverConstant;
 import com.driver.ms.entity.Driver;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -41,5 +43,22 @@ public class DriverRestController {
             return new ResponseEntity<>(listOfDriver, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(method = "Get", description = "Fetch the list of drivers based on the search criteria")
+    @ApiResponse(responseCode = "200",
+            description = "Return a list of drivers based on the filter criteria",
+            content = @Content(schema = @Schema(implementation = Driver.class)))
+    @GetMapping(DriverConstant.DRIVER_ADVANCED_SEARCH)
+    public ResponseEntity<List<Driver>> getDriversByFirstnameOrContractType(@RequestParam("firstname") String firstname,
+                                                                            @RequestParam("contractType") ContractType contractType) {
+        if (firstname.isEmpty() || contractType == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Driver> drivers = driverService.findByFirstname(firstname);
+        if (CollectionUtils.isEmpty(drivers)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(drivers, HttpStatus.OK);
     }
 }

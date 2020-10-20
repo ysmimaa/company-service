@@ -33,7 +33,7 @@ public class Driver implements Serializable {
     @Column
     private String phone;
 
-    @Column
+    @Column(name = "contractType")
     @Enumerated(EnumType.STRING)
     private ContractType contractType;
 }

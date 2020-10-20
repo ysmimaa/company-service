@@ -10,4 +10,6 @@ public interface DriverConstant {
     String DRIVER_URL_BASE = "/api";
 
     String DRIVERS = "/drivers";
+
+    String DRIVER_ADVANCED_SEARCH = "/advanceFilter";
 }
