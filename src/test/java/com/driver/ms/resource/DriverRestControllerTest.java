@@ -4,6 +4,7 @@ import com.driver.ms.common.constant.DriverConstant;
 import com.driver.ms.common.constant.utils.JsonUtils;
 import com.driver.ms.entity.Driver;
 import com.driver.ms.service.DriverService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,6 +15,7 @@ import org.springframework.test.util.AssertionErrors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.List;
 
 import static com.driver.ms.entity.Driver.builder;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class DriverRestControllerTest {
 
@@ -63,6 +65,8 @@ class DriverRestControllerTest {
         //Then
         AssertionErrors.assertEquals("Two users found ", 2, driverList.size());
 
+        verify(driverService, times(1)).getListOfDriver();
+
     }
 
     @Test
@@ -79,22 +83,63 @@ class DriverRestControllerTest {
         //Then
         AssertionErrors.assertEquals("No user found ", 0, driverList.size());
 
+        verify(driverService, times(1)).getListOfDriver();
+
     }
 
     @Test
-    void should_apply_adanced_filter_and_return_the_right_values() throws Exception {
-        List<Driver> driversFound = new ArrayList<>();
+    void should_apply_advanced_filter_and_return_the_right_values() throws Exception {
+        List<Driver> driversFound = Arrays.asList(Driver.builder()
+                        .id(1L)
+                        .firstname("firstname1")
+                        .phone("0623232326")
+                        .build(),
+                Driver.builder()
+                        .id(2L)
+                        .firstname("firstname2")
+                        .phone("0623232000")
+                        .build()
+        );
+
         when(driverService.findByFirstname(anyString())).thenReturn(driversFound);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DriverConstant.DRIVER_URL_BASE + DriverConstant.DRIVER_ADVANCED_SEARCH)
                 .accept(MediaType.APPLICATION_JSON)
-                .param(null)
-                .param(null))
-                .andExpect(null)
+                .param("firstname", "firstname")
+                .param("null", "null")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
         String contentAsString = mvcResult.getResponse().getContentAsString();
         List<Driver> drivers = JsonUtils.deserializeStringToList(contentAsString, Driver.class);
+
+        Assertions.assertAll("Check condition", () -> Assertions.assertEquals(2, drivers.size()));
+
+        verify(driverService, times(1)).findByFirstname(anyString());
+
+    }
+
+    @Test
+    void should_apply_advanced_filter_and_return_an_empty_list() throws Exception {
+        List<Driver> driversFound = new ArrayList<>();
+
+        when(driverService.findByFirstname(anyString())).thenReturn(driversFound);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DriverConstant.DRIVER_URL_BASE + DriverConstant.DRIVER_ADVANCED_SEARCH)
+                .accept(MediaType.APPLICATION_JSON)
+                .param("firstname", "firstname")
+                .param("null", "null")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        List<Driver> drivers = JsonUtils.deserializeStringToList(contentAsString, Driver.class);
+
+        Assertions.assertAll("Check condition", () -> Assertions.assertEquals(0, drivers.size()));
+
+        verify(driverService, times(1)).findByFirstname(anyString());
 
     }
 

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNull;
@@ -66,6 +66,8 @@ class DriverServiceImplUTest {
                 Assertions.assertAll("Verify conditions for displaying the drivers",
                         () -> assertEquals("An empty list of user", 0, listOfDriver.size()));
 
+                verify(driverRepository, times(1)).findAll();
+
             }
         }
 
@@ -92,10 +94,12 @@ class DriverServiceImplUTest {
                                 .id(4L)
                                 .firstname("firstname4")
                                 .build());
-                when(driverRepository.findByFirstname(null)).thenReturn(driversList);
-                List<Driver> listOfDriver = driverService.findByFirstname(null);
+                when(driverRepository.findByFirstname(anyString())).thenReturn(driversList);
+                List<Driver> listOfDriver = driverService.findByFirstname("firstname1");
                 Assertions.assertAll("Verify conditions for displaying the drivers",
                         () -> assertEquals("An empty list of user", 4, listOfDriver.size()));
+
+                verify(driverRepository, times(1)).findByFirstname(anyString());
             }
         }
 
@@ -119,6 +123,8 @@ class DriverServiceImplUTest {
                     Driver createdDriver = driverService.createDriver(driver);
                     Assertions.assertAll("Check condition",
                             () -> assertEquals("A new driver has been created", driver, createdDriver));
+
+                    verify(driverRepository, times(1)).save(any(Driver.class));
                 }
             }
         }
@@ -145,6 +151,9 @@ class DriverServiceImplUTest {
                     Driver createdDriver = driverService.createDriver(driver);
                     Assertions.assertAll("Check condition",
                             () -> assertNull("The new driver already exists", createdDriver));
+
+                    verify(driverRepository, times(1)).findById(anyLong());
+                    verify(driverRepository, times(0)).save(any(Driver.class));
                 }
             }
         }
@@ -152,7 +161,6 @@ class DriverServiceImplUTest {
         @Nested
         @DisplayName("Given a driver to be updated")
         class UpdateDriver {
-
             @Nested
             @DisplayName("When driver passe a new driver")
             class DriverToBeUpdated {
@@ -169,6 +177,10 @@ class DriverServiceImplUTest {
                     Driver updatedDriver = driverService.updateDriver(driver);
                     Assertions.assertAll("Check condition",
                             () -> assertEquals("A driver has been updated", driver, updatedDriver));
+
+                    verify(driverRepository, times(1)).findById(anyLong());
+                    verify(driverRepository, times(1)).save(any(Driver.class));
+
                 }
             }
         }

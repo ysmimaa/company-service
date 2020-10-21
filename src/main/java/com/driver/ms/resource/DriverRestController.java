@@ -50,9 +50,8 @@ public class DriverRestController {
             description = "Return a list of drivers based on the filter criteria",
             content = @Content(schema = @Schema(implementation = Driver.class)))
     @GetMapping(DriverConstant.DRIVER_ADVANCED_SEARCH)
-    public ResponseEntity<List<Driver>> getDriversByFirstnameOrContractType(@RequestParam("firstname") String firstname,
-                                                                            @RequestParam("contractType") ContractType contractType) {
-        if (firstname.isEmpty() || contractType == null) {
+    public ResponseEntity<List<Driver>> getDriversByFirstnameOrContractType(@RequestParam("firstname") String firstname) {
+        if (firstname.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Driver> drivers = driverService.findByFirstname(firstname);
