@@ -2,15 +2,15 @@ package com.driver.ms.entity;
 
 import com.driver.ms.common.constant.DriverConstant;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * Entity Driver
  */
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,11 +18,7 @@ import java.io.Serializable;
 @ToString
 @Entity
 @Table(name = DriverConstant.TABLE_NAME)
-public class Driver implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class Driver extends IdEntity {
 
     @Column
     private String firstname;
@@ -36,4 +32,8 @@ public class Driver implements Serializable {
     @Column(name = "contractType")
     @Enumerated(EnumType.STRING)
     private ContractType contractType;
+
+    @OneToOne
+    @JoinColumn(name = "journey_id")
+    private Journey journey;
 }
