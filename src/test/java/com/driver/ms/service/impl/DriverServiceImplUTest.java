@@ -1,22 +1,24 @@
 package com.driver.ms.service.impl;
 
 import com.driver.ms.entity.Driver;
+import com.driver.ms.entity.Journey;
 import com.driver.ms.repository.DriverRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.driver.ms.entity.Driver.builder;
 
 @DisplayName(" **** Driver services **** ")
 class DriverServiceImplUTest {
@@ -43,11 +45,11 @@ class DriverServiceImplUTest {
             @DisplayName(value = "Then display all drivers available in the list ")
             void should_return_the_list_of_drivers() {
                 when(driverRepository.findAll()).thenReturn(Arrays.asList(
-                        Driver.builder()
+                        builder()
                                 .id(1L)
                                 .firstname("firstname1")
                                 .build(),
-                        Driver.builder()
+                        builder()
                                 .id(2L)
                                 .firstname("firstname2")
                                 .build())
@@ -55,11 +57,60 @@ class DriverServiceImplUTest {
 
                 List<Driver> listOfDriver = driverService.getListOfDriver();
 
-                Assertions.assertAll("Verify conditions for displaying the drivers",
-                        () -> assertEquals("List of user not empty", 2, listOfDriver.size()),
-                        () -> Assertions.assertTrue(listOfDriver.stream().anyMatch(driver -> driver.getId().equals(1L)), "The list contains the driver %s")
+                assertAll("Verify conditions for displaying the drivers",
+                        () -> assertEquals(2, listOfDriver.size(), "List of user not empty"),
+                        () -> assertTrue(listOfDriver.stream().anyMatch(driver -> driver.getId().equals(1L)), "The list contains the driver %s")
                 );
 
+            }
+
+            @DisplayName("When invoking the grouping by journey service")
+            @Nested
+            class DriversGroupedByJourneyTest {
+                @Test
+                @DisplayName(value = "Then display drivers grouped by journey ")
+                void should_return_the_list_of_drivers() {
+                    Journey journey = Journey.builder()
+                            .id(1L)
+                            .city("city1")
+                            .nbrOfPlaces(22)
+                            .build();
+                    Driver expectedDriver = builder()
+                            .id(1L)
+                            .journey(journey)
+                            .build();
+                    List<Driver> drivers = Arrays.asList(
+                            expectedDriver,
+                            builder()
+                                    .id(1L)
+                                    .journey(
+                                            Journey.builder()
+                                                    .id(1L)
+                                                    .city("city2")
+                                                    .nbrOfPlaces(22)
+                                                    .build())
+                                    .build(),
+
+                            builder()
+                                    .id(1L)
+                                    .journey(
+                                            Journey.builder()
+                                                    .id(1L)
+                                                    .city("city3")
+                                                    .nbrOfPlaces(22)
+                                                    .build())
+                                    .build()
+                    );
+
+                    when(driverRepository.findAll()).thenReturn(drivers);
+
+                    Map<Journey, List<Driver>> groupedDriversByJourney = driverService.getGroupedDriversByJourney();
+                    assertAll("Check all the following asserts",
+                            () -> assertEquals(groupedDriversByJourney.size(), 3),
+                            () -> assertEquals(groupedDriversByJourney.get(journey).get(0), expectedDriver));
+
+
+                }
             }
 
             @Test
@@ -67,9 +118,9 @@ class DriverServiceImplUTest {
             void should_return_an_empty_list_of_drivers() {
                 when(driverRepository.findAll()).thenReturn(new ArrayList<>());
                 List<Driver> listOfDriver = driverService.getListOfDriver();
-                Assertions.assertAll("Verify conditions for displaying the drivers",
-                        () -> assertEquals("An empty list of user", 0, listOfDriver.size()),
-                        () -> Assertions.assertTrue(listOfDriver.isEmpty(), "List is empty"));
+                assertAll("Verify conditions for displaying the drivers",
+                        () -> assertEquals(0, listOfDriver.size(), "An empty list of user"),
+                        () -> assertTrue(listOfDriver.isEmpty(), "List is empty"));
                 verify(driverRepository, times(1)).findAll();
 
             }
@@ -88,29 +139,61 @@ class DriverServiceImplUTest {
             @DisplayName(value = "Display drivers based on the search criteria available in the list")
             void should_return_a_list_of_driver_based_on_a_search_criteria() {
                 List<Driver> driversList = Arrays.asList(
-                        Driver.builder()
+                        builder()
                                 .id(1L)
                                 .firstname("firstname1")
                                 .build(),
-                        Driver.builder()
+                        builder()
                                 .id(2L)
                                 .firstname("firstname2")
                                 .build(),
-                        Driver.builder()
+                        builder()
                                 .id(3L)
                                 .firstname("firstname3")
                                 .build(),
-                        Driver.builder()
+                        builder()
                                 .id(4L)
                                 .firstname("firstname4")
                                 .build());
                 when(driverRepository.findByFirstname(anyString())).thenReturn(driversList);
                 List<Driver> listOfDriver = driverService.findByFirstname("firstname1");
-                Assertions.assertAll("Verify conditions for displaying the drivers",
-                        () -> assertEquals("An empty list of user", 4, listOfDriver.size()));
-                org.assertj.core.api.Assertions.assertThat(listOfDriver).contains(driversList.get(0));
+                assertAll("Verify conditions for displaying the drivers",
+                        () -> assertEquals(4, listOfDriver.size(), "An empty list of user"));
+                assertThat(listOfDriver).contains(driversList.get(0));
 
                 verify(driverRepository, times(1)).findByFirstname(anyString());
+            }
+        }
+
+        @DisplayName("When passing the phone criteria ")
+        @Nested
+        class DriverByPhone {
+
+            @Test
+            @DisplayName(value = "Display driver based on the phone search criteria")
+            void should_return_a_driver_based_on_the_phone_search_criteria() {
+                Driver driver = builder()
+                        .id(2L)
+                        .firstname("firstname2")
+                        .phone("070605060")
+                        .build();
+                when(driverRepository.findByPhone(anyString())).thenReturn(driver);
+
+                Driver driverByPhone = driverService.findDriverByPhone("060606060");
+                assertEquals(driver, driverByPhone, "The matching driver");
+                verify(driverRepository, times(1)).findByPhone(anyString());
+            }
+        }
+
+        @DisplayName("When passing an invalid phone criteria ")
+        @Nested
+        class DriverByInvalidPhone {
+
+            @Test
+            @DisplayName(value = "Throw an exception")
+            void should_throw_an_exception() {
+                assertThrows(NullPointerException.class, () -> driverService.findDriverByPhone(""), "Please provide a valid search criteria");
+                verify(driverRepository, times(0)).findByPhone(anyString());
             }
         }
     }
@@ -126,7 +209,7 @@ class DriverServiceImplUTest {
             @DisplayName("Then a new driver should be created and added to the list")
             @Test
             void should_create_a_new_driver() {
-                Driver driver = Driver.builder()
+                Driver driver = builder()
                         .id(1L)
                         .firstname("driver1")
                         .phone("062323236")
@@ -136,8 +219,8 @@ class DriverServiceImplUTest {
 
                 Driver createdDriver = driverService.createDriver(driver);
 
-                Assertions.assertAll("Check conditions",
-                        () -> assertEquals("A new driver has been created", driver, createdDriver));
+                assertAll("Check conditions",
+                        () -> assertEquals(driver, createdDriver, "A new driver has been created"));
                 verify(driverRepository, times(1)).save(any(Driver.class));
             }
         }
@@ -149,11 +232,12 @@ class DriverServiceImplUTest {
             @DisplayName("Then throw an exception")
             @Test
             void should_throw_exception_when_trying_to_add_an_empty_or_invalid_driver() {
-                Driver driver = driverService.createDriver(null);
-                Assertions.fail("should throw an exception");
+                assertThrows(NullPointerException.class, () -> driverService.createDriver(null),
+                        "should throw a NullPointerException exception");
             }
         }
     }
+
 
     @DisplayName("Given a new existing driver")
     @Nested
@@ -166,7 +250,7 @@ class DriverServiceImplUTest {
             @DisplayName("Then the new existing driver must be rejected")
             @Test
             void should_reject_a_new_existing_driver() {
-                Driver driver = Driver.builder()
+                Driver driver = builder()
                         .id(1L)
                         .firstname("driver1")
                         .phone("062323236")
@@ -175,8 +259,8 @@ class DriverServiceImplUTest {
                 when(driverRepository.save(any(Driver.class))).thenReturn(driver);
                 when(driverRepository.findById(anyLong())).thenReturn(Optional.of(driver));
                 Driver createdDriver = driverService.createDriver(driver);
-                Assertions.assertAll("Check condition",
-                        () -> assertNull("The new driver already exists", createdDriver));
+                assertAll("Check condition",
+                        () -> Assertions.assertNull(createdDriver, "The new driver already exists"));
 
                 verify(driverRepository, times(1)).findById(anyLong());
                 verify(driverRepository, times(0)).save(any(Driver.class));
@@ -194,7 +278,7 @@ class DriverServiceImplUTest {
             @DisplayName("Then the existing driver should be updated")
             @Test
             void should_update_a_driver() {
-                Driver driver = Driver.builder()
+                Driver driver = builder()
                         .id(1L)
                         .firstname("driver1")
                         .phone("062323236")
@@ -203,12 +287,11 @@ class DriverServiceImplUTest {
                 when(driverRepository.save(any(Driver.class))).thenReturn(driver);
 
                 Driver updatedDriver = driverService.updateDriver(driver);
-                Assertions.assertAll("Check condition",
-                        () -> assertEquals("A driver has been updated", driver, updatedDriver));
+                assertAll("Check condition",
+                        () -> assertEquals(driver, updatedDriver, "A driver has been updated"));
 
                 verify(driverRepository, times(1)).findById(anyLong());
                 verify(driverRepository, times(1)).save(any(Driver.class));
-
             }
         }
     }
