@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.driver.ms.common.constant.CommonConstant.DRIVER_URL_BASE;
 import static com.driver.ms.entity.Driver.builder;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -56,7 +57,7 @@ class DriverRestControllerTest {
                         .build())
         );
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DriverConstant.DRIVER_URL_BASE + DriverConstant.DRIVERS))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DRIVER_URL_BASE + DriverConstant.DRIVERS))
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -74,7 +75,7 @@ class DriverRestControllerTest {
         //When
         when(driverService.getListOfDriver()).thenReturn(new ArrayList<>());
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DriverConstant.DRIVER_URL_BASE + DriverConstant.DRIVERS))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DRIVER_URL_BASE + DriverConstant.DRIVERS))
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -103,7 +104,7 @@ class DriverRestControllerTest {
 
         when(driverService.findByFirstname(anyString())).thenReturn(driversFound);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DriverConstant.DRIVER_URL_BASE + DriverConstant.DRIVER_ADVANCED_SEARCH)
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DRIVER_URL_BASE + DriverConstant.DRIVER_ADVANCED_SEARCH)
                 .accept(MediaType.APPLICATION_JSON)
                 .param("firstname", "firstname")
                 .param("null", "null")
@@ -126,7 +127,7 @@ class DriverRestControllerTest {
 
         when(driverService.findByFirstname(anyString())).thenReturn(driversFound);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DriverConstant.DRIVER_URL_BASE + DriverConstant.DRIVER_ADVANCED_SEARCH)
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(DRIVER_URL_BASE + DriverConstant.DRIVER_ADVANCED_SEARCH)
                 .accept(MediaType.APPLICATION_JSON)
                 .param("firstname", "firstname")
                 .param("null", "null")

@@ -10,6 +10,8 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static com.driver.ms.common.constant.JourneyConstant.TABLE_NAME;
+
 /**
  * Journey entity
  */
@@ -20,12 +22,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "t_journey")
+@Table(name = TABLE_NAME)
 public class Journey extends IdEntity {
-
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
 
     @Column
     private String city;
@@ -41,4 +39,12 @@ public class Journey extends IdEntity {
 
     @Column
     private LocalDateTime endAt;
+
+    @ManyToOne
+    @JoinColumn(name = "id_company")
+    private Company company;
+
+    @OneToOne
+    @JoinColumn(name = "id_driver")
+    private Driver driver;
 }

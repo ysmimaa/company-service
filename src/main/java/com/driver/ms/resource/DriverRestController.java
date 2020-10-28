@@ -1,9 +1,8 @@
 package com.driver.ms.resource;
 
-import com.driver.ms.entity.ContractType;
-import com.driver.ms.service.DriverService;
 import com.driver.ms.common.constant.DriverConstant;
 import com.driver.ms.entity.Driver;
+import com.driver.ms.service.DriverService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.driver.ms.common.constant.CommonConstant.DRIVER_URL_BASE;
+
 @Tag(name = "Driver", description = "Driver's APIs")
 @RestController
-@RequestMapping(DriverConstant.DRIVER_URL_BASE)
+@RequestMapping(DRIVER_URL_BASE)
 public class DriverRestController {
 
     private DriverService driverService;

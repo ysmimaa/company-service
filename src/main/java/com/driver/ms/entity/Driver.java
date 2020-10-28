@@ -1,10 +1,11 @@
 package com.driver.ms.entity;
 
-import com.driver.ms.common.constant.DriverConstant;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+
+import static com.driver.ms.common.constant.DriverConstant.TABLE_NAME;
 
 /**
  * Entity Driver
@@ -17,7 +18,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = DriverConstant.TABLE_NAME)
+@Table(name = TABLE_NAME)
 public class Driver extends IdEntity {
 
     @Column
@@ -34,6 +35,6 @@ public class Driver extends IdEntity {
     private ContractType contractType;
 
     @OneToOne
-    @JoinColumn(name = "journey_id")
+    @JoinColumn(name = "id_journey")
     private Journey journey;
 }
