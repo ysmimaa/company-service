@@ -4,6 +4,7 @@ import com.driver.ms.common.constant.DriverConstant;
 import com.driver.ms.common.constant.utils.JsonUtils;
 import com.driver.ms.entity.Driver;
 import com.driver.ms.service.DriverService;
+import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.util.AssertionErrors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -141,6 +143,50 @@ class DriverRestControllerTest {
         Assertions.assertAll("Check condition", () -> Assertions.assertEquals(0, drivers.size()));
 
         verify(driverService, times(1)).findByFirstname(anyString());
+
+    }
+
+    @Test
+    void should_delete_a_driver_by_id() throws Exception {
+        Driver driver = Driver.builder()
+                .id(1L)
+                .build();
+
+        when(driverService.deleteDriverById(anyLong())).thenReturn(driver);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(DRIVER_URL_BASE + DriverConstant.DELETE_DRIVER_BY_ID)
+                .param("id", "1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Driver deletedDriver = JsonUtils.deserializeStringToObject(contentAsString, Driver.class);
+
+        org.assertj.core.api.Assertions.assertThat(deletedDriver).isEqualTo(driver);
+
+        verify(driverService, times(1)).deleteDriverById(anyLong());
+
+    }
+
+
+    @Test
+    void should_create_a_driver() throws Exception {
+        Driver driver = Driver.builder()
+                .id(1L)
+                .build();
+
+        when(driverService.createDriver(any(Driver.class))).thenReturn(driver);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(DRIVER_URL_BASE + DriverConstant.CREATE_DRIVER))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        Driver createdDriver = JsonUtils.deserializeStringToObject(contentAsString, Driver.class);
+
+        org.assertj.core.api.Assertions.assertThat(createdDriver).isEqualTo(driver);
+
+        verify(driverService, times(1)).createDriver(any(Driver.class));
 
     }
 

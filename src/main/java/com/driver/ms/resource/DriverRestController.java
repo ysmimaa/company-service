@@ -8,19 +8,23 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import static com.driver.ms.common.constant.CommonConstant.DRIVER_URL_BASE;
 
+@CrossOrigin(origins = {"http://localhost:4200"})
 @Tag(name = "Driver", description = "Driver's APIs")
 @RestController
 @RequestMapping(DRIVER_URL_BASE)
@@ -60,5 +64,58 @@ public class DriverRestController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(drivers, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "driver/{id}")
+    public ResponseEntity<Driver> getDriver(@PathVariable(name = "id") Long id) {
+        if (id != null) {
+            return new ResponseEntity<>(driverService.findDriverById(id), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping(path = "driver/{id}")
+    public ResponseEntity<Driver> deleteDriver(@PathVariable(name = "id") Long id) {
+        if (id != null) {
+            return new ResponseEntity<>(driverService.deleteDriverById(id), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping(path = DriverConstant.CREATE_DRIVER)
+    public ResponseEntity<Driver> createDriver(@RequestBody Driver driver) {
+        if (driver != null) {
+            Driver createdDriver = driverService.createDriver(driver);
+            return new ResponseEntity<>(createdDriver, HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping(path = DriverConstant.UPDATE_DRIVER)
+    public ResponseEntity<Driver> updateDriver(@RequestBody Driver driver) {
+        if (driver != null) {
+            Driver updatedDriver = driverService.updateDriver(driver);
+            return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("fireUp")
+    public void fireUp() {
+        Instant startTime = Instant.now();
+        driverService.testPerformance();
+        Instant endTime = Instant.now();
+        Duration duration = Duration.between(startTime, endTime);
+        System.out.println(duration.getSeconds());
+    }
+
+    @GetMapping(path = DriverConstant.BASIC_AUTH)
+    public ResponseEntity<Boolean> getAuth() {
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "exception")
+    public String getException() {
+        throw new RuntimeException("Testing the exception behavior");
     }
 }

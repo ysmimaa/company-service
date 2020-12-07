@@ -5,6 +5,8 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
+import java.time.LocalDateTime;
+
 import static com.driver.ms.common.constant.DriverConstant.TABLE_NAME;
 
 /**
@@ -37,4 +39,7 @@ public class Driver extends IdEntity {
     @OneToOne
     @JoinColumn(name = "id_journey")
     private Journey journey;
+
+    @Column
+    private LocalDateTime hiredDate;
 }

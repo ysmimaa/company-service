@@ -62,4 +62,8 @@ public interface DriverService {
      * @return the list of drivers grouped by journey
      */
     Map<Journey, List<Driver>> getGroupedDriversByJourney();
+
+    void testPerformance();
+
+    Driver deleteDriverById(Long id);
 }

@@ -6,10 +6,16 @@ import com.driver.ms.repository.DriverRepository;
 import com.driver.ms.service.DriverService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -59,7 +65,7 @@ public class DriverServiceImpl implements DriverService {
                 Driver driverById = findDriverById(driverId);
                 if (driverById != null) {
                     log.debug("The driver has been saved");
-                    return driverRepository.save(driverById);
+                    return driverRepository.save(driver);
                 }
             }
         }
@@ -87,5 +93,57 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Map<Journey, List<Driver>> getGroupedDriversByJourney() {
         return driverRepository.findAll().stream().collect(Collectors.groupingBy(Driver::getJourney));
+    }
+
+    @Async(value = "Pool1")
+    @Override
+    public void testPerformance() {
+        RestTemplate restTemplate = new RestTemplate();
+        List<Driver> drivers = new ArrayList<>();
+        for (int i = 1; i < 10000; i++) {
+            Driver retrievedDriver = restTemplate.getForObject("http://localhost:8081/driver/api/driver/1", Driver.class);
+            drivers.add(retrievedDriver);
+        }
+        List<StringBuilder> outputDrivers = new ArrayList<>();
+        for (Driver d : drivers) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(d.getFirstname());
+            stringBuilder.append(" ; ");
+            outputDrivers.add(stringBuilder);
+        }
+
+        outputDrivers.forEach(System.out::println);
+
+    }
+
+    public static List<StringBuilder> getData() {
+        List<Driver> drivers = new ArrayList<>();
+        for (long i = 1; i < 1000000; i++) {
+            Driver driver = Driver.builder().id(i).firstname("firstname" + i).build();
+            drivers.add(driver);
+        }
+        List<StringBuilder> outputDrivers = new ArrayList<>();
+        for (Driver d : drivers) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(" ** ");
+            stringBuilder.append(d.getFirstname());
+            stringBuilder.append(" ; ");
+            outputDrivers.add(stringBuilder);
+        }
+        outputDrivers.forEach(System.out::println);
+
+        return outputDrivers;
+
+    }
+
+    @Override
+    public Driver deleteDriverById(Long id) {
+        if (id != null) {
+            Driver driverById = findDriverById(id);
+            if (driverById != null)
+                driverRepository.delete(driverById);
+            return driverById;
+        }
+        return null;
     }
 }
