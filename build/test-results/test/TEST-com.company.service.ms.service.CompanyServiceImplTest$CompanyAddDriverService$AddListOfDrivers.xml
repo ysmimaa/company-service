@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="When user provide a list of valid drivers" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-01-05T20:59:20" hostname="ysmimaa-Latitude-E6330" time="0.006">
+  <properties/>
+  <testcase name="Then drivers are added to the company's list of drivers" classname="com.company.service.ms.service.CompanyServiceImplTest$CompanyAddDriverService$AddListOfDrivers" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

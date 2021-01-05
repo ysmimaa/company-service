@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="When user invoke the grouped driver by city service" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-01-05T20:59:20" hostname="ysmimaa-Latitude-E6330" time="0.009">
+  <properties/>
+  <testcase name="Then display a company with a grouped driver by city" classname="com.company.service.ms.service.CompanyServiceImplTest$CompanyGroupedDriverByCityServicesSpec$DisplayDriversByFirstNameCriteriaSpec" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

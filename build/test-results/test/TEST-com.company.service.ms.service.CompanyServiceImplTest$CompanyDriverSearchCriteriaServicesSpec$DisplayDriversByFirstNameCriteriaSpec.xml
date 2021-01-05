@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="When user provide a driver's firstName as a criteria" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-01-05T20:59:20" hostname="ysmimaa-Latitude-E6330" time="0.012">
+  <properties/>
+  <testcase name="Then display a list of drivers based on the firstName criteria" classname="com.company.service.ms.service.CompanyServiceImplTest$CompanyDriverSearchCriteriaServicesSpec$DisplayDriversByFirstNameCriteriaSpec" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

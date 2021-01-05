@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="When user invoke the grouped driver any criteria service" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-01-05T20:59:19" hostname="ysmimaa-Latitude-E6330" time="1.079">
+  <properties/>
+  <testcase name="Then display a company with grouped drivers by the criteria" classname="com.company.service.ms.service.CompanyServiceImplTest$CompanyGroupedDriverByCriteriaServicesSpec$DisplayDriversByAnyCriteriaSpec" time="1.079"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
