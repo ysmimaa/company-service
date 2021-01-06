@@ -1,13 +1,16 @@
 package com.company.service.ms.service;
 
+import com.company.service.ms.common.CompanyParameterResolver;
 import com.company.service.ms.common.DependenciesInitializer;
 import com.company.service.ms.entity.Address;
 import com.company.service.ms.entity.Company;
 import com.company.service.ms.entity.Driver;
 import com.company.service.ms.exception.EmptyCompanyListException;
+import com.company.service.ms.exception.InvalidParamException;
 import com.company.service.ms.feign.DriverFeignClient;
 import com.company.service.ms.repository.CompanyRepository;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 
 import static org.mockito.Mockito.when;
@@ -15,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.*;
 
+@ExtendWith(CompanyParameterResolver.class)
 @DisplayName("<=******* Company specifications *******=>")
 class CompanyServiceImplTest extends DependenciesInitializer {
     final String MEKNES_CITY = "Meknes";
@@ -28,13 +32,12 @@ class CompanyServiceImplTest extends DependenciesInitializer {
     @Mock
     private DriverFeignClient driverFeignClient;
 
-    public CompanyServiceImplTest() {
-
-    }
+    private List<Driver> driversList;
 
     @BeforeEach
-    void init() {
+    void init(Map<String, Driver> driverMap) {
         companyService = new CompanyServiceImpl(companyRepository, driverFeignClient);
+        driversList = new ArrayList<>(driverMap.values());
         MockitoAnnotations.initMocks(this);
     }
 
@@ -69,22 +72,16 @@ class CompanyServiceImplTest extends DependenciesInitializer {
             @Test
             void should_add_a_driver_to_list_of_driver() {
                 //Given
-                Driver driverToBeAdded = Driver.builder()
-                        .id(1L)
-                        .firstname("driver-firstName1")
-                        .lastname("driver-lastName1")
-                        .build();
-
                 List<Driver> drivers = new ArrayList<>();
 
                 Optional<Company> company = Optional.of(Company.builder()
                         .id(1L)
                         .drivers(drivers)
                         .build());
-                when(driverFeignClient.getDriverById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(driverToBeAdded));
+                when(driverFeignClient.getDriverById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(driversList.get(0)));
                 when(companyRepository.findById(ArgumentMatchers.anyLong())).thenReturn(company);
 
-                Company returnedCompanyById = companyService.addDriverToListOfDrivers(driverToBeAdded, company.get());
+                Company returnedCompanyById = companyService.addDriverToListOfDrivers(driversList.get(0), company.get());
 
                 Assertions.assertTrue(returnedCompanyById.getDrivers().size() > 0, "The list of drivers should not be empty");
             }
@@ -99,20 +96,6 @@ class CompanyServiceImplTest extends DependenciesInitializer {
             @Test
             void should_add_a_list_of_drivers_to_the_company_s_list_of_drivers() {
                 //Given
-                List<Driver> driversToBeAdded = Arrays.asList(
-                        Driver.builder()
-                                .id(1L)
-                                .firstname("driver-firstName1")
-                                .lastname("driver-lastName1")
-                                .build()
-                        ,
-                        Driver.builder()
-                                .id(2L)
-                                .firstname("driver-firstName2")
-                                .lastname("driver-lastName2")
-                                .build()
-                );
-
                 List<Driver> drivers = new ArrayList<>();
 
                 Optional<Company> company = Optional.of(Company.builder()
@@ -120,12 +103,12 @@ class CompanyServiceImplTest extends DependenciesInitializer {
                         .drivers(drivers)
                         .build());
                 when(companyRepository.findById(ArgumentMatchers.anyLong())).thenReturn(company);
-                when(driverFeignClient.getListOfDriversById(ArgumentMatchers.anyList())).thenReturn(driversToBeAdded);
+                when(driverFeignClient.getListOfDriversById(ArgumentMatchers.anyList())).thenReturn(driversList);
 
-                Company returnedCompanyById = companyService.addListOfDriversToCompany(company.get(), driversToBeAdded);
+                Company returnedCompanyById = companyService.addListOfDriversToCompany(company.get(), driversList);
 
                 Assertions.assertTrue(returnedCompanyById.getDrivers().size() > 1, "The list of drivers should be greater than 1");
-                Assertions.assertEquals(returnedCompanyById.getDrivers().get(0), driversToBeAdded.get(0));
+                Assertions.assertEquals(returnedCompanyById.getDrivers().get(0), driversList.get(0));
             }
 
         }
@@ -149,33 +132,17 @@ class CompanyServiceImplTest extends DependenciesInitializer {
     @DisplayName("Given company driver search criteria services")
     class CompanyDriverSearchCriteriaServicesSpec {
         @Nested
-        @DisplayName("When user provide a driver's firstName as a criteria")
+        @DisplayName("When user provides a driver's firstName as a criteria")
         class DisplayDriversByFirstNameCriteriaSpec {
             @Test
             @DisplayName("Then display a list of drivers based on the firstName criteria")
             void should_return_a_list_of_driver_related_to_the_firstName_criteria() {
-                List<Driver> listOfDrivers = Arrays.asList(
-                        Driver.builder()
-                                .id(1L)
-                                .firstname("driver-firstName1")
-                                .lastname("driver-lastName1")
-                                .build()
-                        ,
-                        Driver.builder()
-                                .id(2L)
-                                .firstname("driver-firstName1")
-                                .lastname("driver-lastName2")
-                                .build()
-                );
-
-                Company mockCompany = Company.builder().drivers(listOfDrivers).build();
+                Company mockCompany = Company.builder().drivers(driversList).build();
                 when(companyRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(mockCompany));
-                when(driverFeignClient.getListOfDriverByCompanyId(ArgumentMatchers.anyLong())).thenReturn(listOfDrivers);
 
-                Company companyWithListOfDriversBasedOnFirstName = companyService.findCompanyByDriverFirstName(1L, "");
+                Company companyWithListOfDriversBasedOnFirstName = companyService.findCompanyByDriverFirstName(1L, "driver-firstName1");
 
-                Assertions.assertEquals(companyWithListOfDriversBasedOnFirstName.getDrivers().get(0).getFirstname(), listOfDrivers.get(0).getFirstname());
-                Assertions.assertEquals(companyWithListOfDriversBasedOnFirstName.getDrivers().get(1).getFirstname(), listOfDrivers.get(1).getFirstname());
+                Assertions.assertEquals(companyWithListOfDriversBasedOnFirstName.getDrivers().get(0).getFirstname(), driversList.get(0).getFirstname());
             }
         }
     }
@@ -189,38 +156,14 @@ class CompanyServiceImplTest extends DependenciesInitializer {
             @Test
             @DisplayName("Then display a company with a grouped driver by city")
             void should_return_a_company_containing_a_grouped_list_of_driver_by_city() {
-                List<Driver> listOfDrivers = new LinkedList<>(Arrays.asList(
-                        Driver.builder()
-                                .id(1L)
-                                .firstname("driver-firstName1")
-                                .address(
-                                        Address.builder()
-                                                .city(MEKNES_CITY)
-                                                .build()
-                                )
-                                .lastname("driver-lastName1")
-                                .build()
-                        ,
-                        Driver.builder()
-                                .id(2L)
-                                .firstname("driver-firstName1")
-                                .address(
-                                        Address.builder()
-                                                .city(MEKNES_CITY)
-                                                .build()
-                                )
-                                .lastname("driver-lastName2")
-                                .build()
-                ));
-
                 Company mockCompany = Company.builder().drivers(new LinkedList<>()).build();
                 when(companyRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(mockCompany));
-                when(driverFeignClient.getListOfDriverByCompanyId(ArgumentMatchers.anyLong())).thenReturn(listOfDrivers);
+                when(driverFeignClient.getListOfDriverByCompanyId(ArgumentMatchers.anyLong())).thenReturn(driversList);
 
                 Map<String, List<Driver>> companyWithListOfDriversGroupedByCity = companyService.findCompanyWithDriverGroupedCity(1L);
 
                 assertThat(companyWithListOfDriversGroupedByCity).containsKey(MEKNES_CITY);
-                assertThat(companyWithListOfDriversGroupedByCity).containsValues(listOfDrivers);
+                assertThat(companyWithListOfDriversGroupedByCity).containsValues(driversList);
 
             }
         }
@@ -235,34 +178,9 @@ class CompanyServiceImplTest extends DependenciesInitializer {
             @Test
             @DisplayName("Then display a company with grouped drivers by the criteria")
             void should_return_a_company_with_a_grouped_list_of_driver_by_criteria() {
-
-                List<Driver> listOfDrivers = new ArrayList<>(Arrays.asList(
-                        Driver.builder()
-                                .id(1L)
-                                .firstname("driver-firstName1")
-                                .address(
-                                        Address.builder()
-                                                .city(MEKNES_CITY)
-                                                .build()
-                                )
-                                .lastname("driver-lastName1")
-                                .build()
-                        ,
-                        Driver.builder()
-                                .id(2L)
-                                .firstname("driver-firstName2")
-                                .address(
-                                        Address.builder()
-                                                .city(MEKNES_CITY)
-                                                .build()
-                                )
-                                .lastname("driver-lastName2")
-                                .build()
-                ));
-
                 Company mockCompany = Company.builder().drivers(new ArrayList<>()).build();
                 when(companyRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(mockCompany));
-                when(driverFeignClient.getListOfDriverByCompanyId(ArgumentMatchers.anyLong())).thenReturn(listOfDrivers);
+                when(driverFeignClient.getListOfDriverByCompanyId(ArgumentMatchers.anyLong())).thenReturn(driversList);
 
                 Map<String, List<Driver>> companyWithListOfDriversGroupedByCriteria = companyService.findCompanyWithDriverGroupedByCriteria(d -> d.getAddress().getCity(), 1L);
 
