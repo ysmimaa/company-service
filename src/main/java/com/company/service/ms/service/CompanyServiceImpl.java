@@ -3,6 +3,7 @@ package com.company.service.ms.service;
 import com.company.service.ms.entity.Company;
 import com.company.service.ms.entity.Driver;
 import com.company.service.ms.exception.EmptyCompanyListException;
+import com.company.service.ms.exception.InvalidParamException;
 import com.company.service.ms.feign.DriverFeignClient;
 import com.company.service.ms.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
@@ -75,11 +76,11 @@ public class CompanyServiceImpl implements CompanyService {
             throw new InvalidParamException("Please provide a valid param");
         }
         return companyRepository.findById(companyId).flatMap(company -> {
-            List<Driver> companyWithDriversByFirstName = driverFeignClient.getListOfDriverByCompanyId(company.getId()).stream()
-                    .filter(driver -> driver.getFirstname().equalsIgnoreCase(firstName))
+            List<Driver> driversByFirstName = company.getDrivers().stream()
+                    .filter(driver -> driver.getFirstname().equals(firstName))
                     .collect(Collectors.toList());
-            if (!CollectionUtils.isEmpty(companyWithDriversByFirstName)) {
-                company.getDrivers().addAll(companyWithDriversByFirstName);
+            if (!CollectionUtils.isEmpty(driversByFirstName)) {
+                company.setDrivers(driversByFirstName);
             }
             return Optional.of(company);
         }).orElseThrow(() -> new RuntimeException("No company has been found"));
@@ -102,7 +103,6 @@ public class CompanyServiceImpl implements CompanyService {
                 .stream()
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingBy(driver -> driver.getAddress().getCity()));
-
     }
 
     @Override
