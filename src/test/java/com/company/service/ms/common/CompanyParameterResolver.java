@@ -8,22 +8,16 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class CompanyParameterResolver implements ParameterResolver {
     final String MEKNES_CITY = "Meknes";
 
-    @Override
-    public boolean supportsParameter(ParameterContext parameterContext,
-                                     ExtensionContext extensionContext) throws ParameterResolutionException {
-        Parameter parameter = parameterContext.getParameter();
-        return Objects.equals(parameter.getParameterizedType().getTypeName(),
-                "java.util.Map<java.lang.String, com.company.service.ms.entity.Driver>");
-    }
+    private Map<String, Driver> drivers;
 
-    @Override
-    public Object resolveParameter(ParameterContext parameterContext,
-                                   ExtensionContext extensionContext) throws ParameterResolutionException {
+    public CompanyParameterResolver() {
         Map<String, Driver> driverMap = new HashMap<>();
         driverMap.put("driver1", Driver.builder()
                 .id(1L)
@@ -46,7 +40,22 @@ public class CompanyParameterResolver implements ParameterResolver {
                 )
                 .lastname("driver-lastName2")
                 .build());
+        this.drivers = driverMap;
+    }
 
-        return driverMap;
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext,
+                                     ExtensionContext extensionContext) throws ParameterResolutionException {
+        Parameter parameter = parameterContext.getParameter();
+        return Objects.equals(parameter.getParameterizedType().getTypeName(),
+                "java.util.Map<java.lang.String, com.company.service.ms.entity.Driver>");
+    }
+
+    @Override
+    public Object resolveParameter(ParameterContext parameterContext,
+                                   ExtensionContext extensionContext) throws ParameterResolutionException {
+        /*ExtensionContext.Store store = extensionContext.getStore(ExtensionContext.Namespace.create(Driver.class));
+        store.getOrComputeIfAbsent("drivers", k -> getDrivers());*/
+        return drivers;
     }
 }

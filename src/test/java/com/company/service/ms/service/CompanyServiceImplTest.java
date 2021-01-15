@@ -2,17 +2,18 @@ package com.company.service.ms.service;
 
 import com.company.service.ms.common.CompanyParameterResolver;
 import com.company.service.ms.common.DependenciesInitializer;
-import com.company.service.ms.entity.Address;
 import com.company.service.ms.entity.Company;
 import com.company.service.ms.entity.Driver;
 import com.company.service.ms.exception.EmptyCompanyListException;
 import com.company.service.ms.exception.InvalidParamException;
 import com.company.service.ms.feign.DriverFeignClient;
 import com.company.service.ms.repository.CompanyRepository;
+import com.company.service.ms.service.impl.CompanyServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +46,7 @@ class CompanyServiceImplTest extends DependenciesInitializer {
     @DisplayName("Given company display services")
     class CompanyDisplayServicesSpec {
         @Nested
-        @DisplayName("When the list of companies is empty")
+        @DisplayName("When a user calls the list of companies service and the result is empty")
         class DisplayCompanyThrowExceptionSpec {
             @Test
             @DisplayName("Then an empty list is returned")
@@ -62,7 +63,7 @@ class CompanyServiceImplTest extends DependenciesInitializer {
 
     @DisplayName(value = "Given company add driver service")
     @Nested
-    class CompanyAddDriverService {
+    class CompanyAddDriverServiceSpec {
 
         @DisplayName(value = "When user provide a valid driver")
         @Nested
@@ -190,5 +191,60 @@ class CompanyServiceImplTest extends DependenciesInitializer {
         }
     }
 
+    @Nested
+    @DisplayName(value = "Given search company services")
+    class SearchCompanyServicesSpec {
 
+        @Nested
+        @DisplayName(value = "When user provides a name company criteria")
+        class SearchCompanyByNameService {
+
+            @DisplayName(value = "Then a company with the name is displayed")
+            @Test
+            void should_return_a_company_when_providing_the_name_criteria() {
+                when(companyRepository.findCompanyByName(anyString())).thenReturn(Optional.of(Company.builder()
+                        .id(1L)
+                        .name("company1")
+                        .build())
+                );
+                Company companyWithItsName = companyService.findCompanyWithItsName("company1");
+                Assertions.assertEquals(companyWithItsName.getName(), "company1");
+
+            }
+
+        }
+
+        @Nested
+        @DisplayName(value = "When user provides an invalid name company criteria")
+        class SearchCompanyByNameInvalidCriteriaService {
+
+            @DisplayName(value = "Then invalid parameter exception is thrown")
+            @Test
+            void should_throw_invalid_parameter_exception_when_providing_invalid_name_criteria() {
+                Assertions.assertThrows(InvalidParamException.class, () -> companyService.findCompanyWithItsName(""));
+            }
+
+        }
+    }
+
+    @DisplayName("Given a company/companies")
+    @Nested
+    class GuessPluralOrSingleCompanyExistence {
+
+        @Nested
+        @DisplayName("When user provides a single company")
+        class SingleCompanyGuess {
+
+            @DisplayName("Then display company in a singular")
+            @Test
+            void should_return_company_in_singular() {
+                String guessCompany = companyService.guessCompanyIsPluralOrSingular("company", 1);
+                Assertions.assertEquals("There is 1 company",guessCompany);
+
+            }
+
+        }
+
+
+    }
 }

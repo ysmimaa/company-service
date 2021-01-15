@@ -41,18 +41,33 @@ public interface CompanyService {
     Company findCompanyByDriverFirstName(Long companyId, String firstName);
 
     /**
-     *
      * @param
      * @param
      * @return
      */
-    Map<String,List<Driver>> findCompanyWithDriverGroupedCity(Long companyId);
+    Map<String, List<Driver>> findCompanyWithDriverGroupedCity(Long companyId);
 
     /**
-     *
      * @param functionByCriteria
      * @param <K>
      * @return
      */
     <K> Map<K, List<Driver>> findCompanyWithDriverGroupedByCriteria(Function<Driver, K> functionByCriteria, Long companyId);
+
+    /**
+     * Method that handle return a company by it name
+     *
+     * @return campany
+     */
+    Company findCompanyWithItsName(String companyName);
+
+    String guessCompanyIsPluralOrSingular(String companyName, int count);
+
+    /**
+     * Method that create a new company
+     *
+     * @param company
+     * @return created company
+     */
+    Company create(Company company);
 }

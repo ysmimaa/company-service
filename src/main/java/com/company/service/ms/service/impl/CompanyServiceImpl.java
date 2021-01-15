@@ -1,13 +1,16 @@
-package com.company.service.ms.service;
+package com.company.service.ms.service.impl;
 
 import com.company.service.ms.entity.Company;
 import com.company.service.ms.entity.Driver;
+import com.company.service.ms.entity.GuessCompany;
 import com.company.service.ms.exception.EmptyCompanyListException;
 import com.company.service.ms.exception.InvalidParamException;
 import com.company.service.ms.feign.DriverFeignClient;
 import com.company.service.ms.repository.CompanyRepository;
+import com.company.service.ms.service.CompanyService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -119,5 +122,24 @@ public class CompanyServiceImpl implements CompanyService {
                 .stream()
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingBy(functionByCriteria));
+    }
+
+    @Override
+    public Company findCompanyWithItsName(String companyName) {
+        if (StringUtils.isEmpty(companyName)) {
+            throw new InvalidParamException("Please provide a valid parameter");
+        }
+        return companyRepository.findCompanyByName(companyName)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+    }
+
+    @Override
+    public String guessCompanyIsPluralOrSingular(String companyName, int count) {
+        return new GuessCompany().guess(companyName,count);
+    }
+
+    @Override
+    public Company create(Company company) {
+        return null;
     }
 }
